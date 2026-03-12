@@ -1,0 +1,3 @@
+[build]
+dockerfilePath = "Dockerfile"
+dockerTarget = "frankenphp_prod"
