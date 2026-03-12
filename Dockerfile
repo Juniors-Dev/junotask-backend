@@ -94,7 +94,7 @@ RUN rm -Rf frankenphp/
 
 RUN set -eux; \
 	mkdir -p var/cache var/log; \
-	printf 'APP_ENV=prod\nDATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy?serverVersion=16&charset=utf8\n' > .env; \
+	printf 'APP_ENV=prod\nAPP_SECRET=build-placeholder\nDATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy?serverVersion=16&charset=utf8\nTRUSTED_PROXIES=127.0.0.1\nTRUSTED_HOSTS=^localhost$$\nCORS_ALLOW_ORIGIN=^https?://localhost$$\nMERCURE_URL=http://localhost/.well-known/mercure\nMERCURE_PUBLIC_URL=http://localhost/.well-known/mercure\nMERCURE_JWT_SECRET=build-placeholder\n' > .env; \
 	composer dump-autoload --classmap-authoritative --no-dev; \
 	composer run-script --no-dev post-install-cmd; \
 	rm .env; \
