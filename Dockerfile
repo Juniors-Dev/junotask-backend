@@ -94,7 +94,7 @@ RUN rm -Rf frankenphp/
 
 RUN set -eux; \
 	mkdir -p var/cache var/log; \
-	printf 'APP_ENV=prod\nDATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy\n' > .env; \
+	printf 'APP_ENV=prod\nDATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy?serverVersion=16&charset=utf8\n' > .env; \
 	composer dump-autoload --classmap-authoritative --no-dev; \
 	composer run-script --no-dev post-install-cmd; \
 	rm .env; \
