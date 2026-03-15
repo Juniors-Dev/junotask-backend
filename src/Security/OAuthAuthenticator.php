@@ -68,8 +68,13 @@ class OAuthAuthenticator extends AbstractAuthenticator
                 ->setJobPosition(JobPosition::Fullstack)
                 ->setCreatedAt(new \DateTime());
 
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
+            try {
+                $this->entityManager->persist($user);
+                $this->entityManager->flush();
+            } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException) {
+                $this->entityManager->clear();
+                $user = $this->userRepository->findOneBy(['email' => $email]);
+            }
         }
 
         // implement your own logic to get the user identifier from `$apiToken`

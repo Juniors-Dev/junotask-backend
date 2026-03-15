@@ -40,7 +40,7 @@ class User implements \Symfony\Component\Security\Core\User\UserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $googleId = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
