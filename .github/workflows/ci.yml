@@ -1,0 +1,79 @@
+# This workflow runs on every PR to dev and main
+# It checks that PHP code is valid and tests pass
+name: CI
+
+# When does this run?
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev]
+
+# Cancel old runs if you push again
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+
+    # Spin up a Postgres database for tests
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: app_test
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      # Step 1: Download the code
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Step 2: Set up PHP with extensions needed by Symfony
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: intl, pdo_pgsql
+          coverage: none
+
+      # Step 3: Cache Composer dependencies
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      # Step 4: Install dependencies
+      - name: Install dependencies
+        run: composer install --no-progress --prefer-dist
+
+      # Step 5: Create .env for Symfony
+      - name: Setup environment
+        run: |
+          echo "APP_ENV=test" > .env.test.local
+          echo "DATABASE_URL=postgresql://app:test@localhost:5432/app_test?serverVersion=16&charset=utf8" >> .env.test.local
+
+      # Step 6: Run database migrations
+      - name: Run migrations
+        run: php bin/console doctrine:migrations:migrate --no-interaction --env=test
+
+      # Step 7: Validate the Doctrine schema matches the entities
+      - name: Validate schema
+        run: php bin/console doctrine:schema:validate --env=test
+
+      # Step 8: Run the test suite
+      - name: Run PHPUnit
+        run: php bin/phpunit
