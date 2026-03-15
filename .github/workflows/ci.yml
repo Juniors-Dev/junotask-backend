@@ -24,7 +24,7 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_DB: app_test
+          POSTGRES_DB: app
           POSTGRES_USER: app
           POSTGRES_PASSWORD: test
         ports:
@@ -59,7 +59,7 @@ jobs:
       # Step 4: Create .env so Symfony can boot during composer install
       - name: Setup environment
         run: |
-          printf 'APP_ENV=test\nAPP_SECRET=ci-secret\nDATABASE_URL=postgresql://app:test@localhost:5432/app_test?serverVersion=16&charset=utf8\nTRUSTED_PROXIES=127.0.0.1\nTRUSTED_HOSTS=^localhost$\nCORS_ALLOW_ORIGIN=^https?://localhost$\nMERCURE_URL=http://localhost/.well-known/mercure\nMERCURE_PUBLIC_URL=http://localhost/.well-known/mercure\nMERCURE_JWT_SECRET=ci-secret\n' > .env
+          printf 'APP_ENV=test\nAPP_SECRET=ci-secret\nDATABASE_URL=postgresql://app:test@localhost:5432/app?serverVersion=16&charset=utf8\nTRUSTED_PROXIES=127.0.0.1\nTRUSTED_HOSTS=^localhost$\nCORS_ALLOW_ORIGIN=^https?://localhost$\nMERCURE_URL=http://localhost/.well-known/mercure\nMERCURE_PUBLIC_URL=http://localhost/.well-known/mercure\nMERCURE_JWT_SECRET=ci-secret\n' > .env
 
       # Step 5: Install dependencies
       - name: Install dependencies
