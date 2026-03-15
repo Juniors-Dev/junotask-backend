@@ -65,14 +65,18 @@ jobs:
       - name: Install dependencies
         run: composer install --no-progress --prefer-dist
 
-      # Step 6: Run database migrations
+      # Step 6: Create the test database (Symfony appends "_test" to the DB name)
+      - name: Create test database
+        run: php bin/console doctrine:database:create --env=test
+
+      # Step 7: Run database migrations
       - name: Run migrations
         run: php bin/console doctrine:migrations:migrate --no-interaction --env=test
 
-      # Step 7: Validate the Doctrine schema matches the entities
+      # Step 8: Validate the Doctrine schema matches the entities
       - name: Validate schema
         run: php bin/console doctrine:schema:validate --env=test
 
-      # Step 8: Run the test suite
+      # Step 9: Run the test suite
       - name: Run PHPUnit
         run: php bin/phpunit
